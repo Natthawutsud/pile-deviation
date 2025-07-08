@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Editor</title>
+    <style>
+        body { font-family: sans-serif; background: #f0f0f0; padding: 20px; }
+        .container { background: white; padding: 20px; border-radius: 8px; max-width: 500px; margin: auto; }
+        label, input, select, button { display: block; width: 100%; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #eee; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>แก้ไขพิกัด Design</h2>
+        <input type="text" id="pileNo" placeholder="Pile No.">
+        <input type="number" id="nDesign" placeholder="N (Design)">
+        <input type="number" id="eDesign" placeholder="E (Design)">
+        <button onclick="addOrUpdate()">เพิ่ม / แก้ไข</button>
+        <button onclick="downloadJSON()">บันทึกเป็น JSON</button>
+        <table>
+            <thead><tr><th>Pile No.</th><th>N</th><th>E</th><th>ลบ</th></tr></thead>
+            <tbody id="designTable"></tbody>
+        </table>
+        <a href="index.html">← กลับหน้าหลัก</a>
+    </div>
+
+    <script>
+        let designData = {};
+
+        function renderTable() {
+            const tbody = document.getElementById('designTable');
+            tbody.innerHTML = '';
+            for (const [pile, coords] of Object.entries(designData)) {
+                tbody.innerHTML += `<tr>
+                    <td>${pile}</td><td>${coords.N}</td><td>${coords.E}</td>
+                    <td><button onclick="removePile('${pile}')">ลบ</button></td>
+                </tr>`;
+            }
+        }
+
+        function addOrUpdate() {
+            const pile = document.getElementById('pileNo').value.trim();
+            const n = parseFloat(document.getElementById('nDesign').value);
+            const e = parseFloat(document.getElementById('eDesign').value);
+            if (pile && !isNaN(n) && !isNaN(e)) {
+                designData[pile] = { N: n, E: e };
+                renderTable();
+            }
+        }
+
+        function removePile(pile) {
+            delete designData[pile];
+            renderTable();
+        }
+
+        function downloadJSON() {
+            const blob = new Blob([JSON.stringify(designData, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'design.json';
+            link.click();
+        }
+    </script>
+</body>
+</html>
